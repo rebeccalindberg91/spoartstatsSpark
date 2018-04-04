@@ -5,7 +5,7 @@
         <filter-class>spark.servlet.SparkFilter</filter-class>
         <init-param>
             <param-name>applicationClass</param-name>
-            <param-value>com.mycompany.sportstatsspark.SampleSparkEndpoint</param-value>
+            <param-value>com.mycompany.sportstatsspark.SportstatsApp</param-value>
         </init-param>
     </filter>
     <filter-mapping>
