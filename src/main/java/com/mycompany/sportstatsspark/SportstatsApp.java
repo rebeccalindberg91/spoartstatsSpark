@@ -75,6 +75,8 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
+        
+        //List all leagues
     }
 
     private String run(SportstatsService service) {
