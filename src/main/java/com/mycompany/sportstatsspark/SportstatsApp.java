@@ -11,6 +11,8 @@ import com.mycompany.sportstatsspark.shapes.SportShape;
 import com.mycompany.sportstatsspark.shapes.TeamShape;
 import com.owlike.genson.Genson;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
@@ -37,6 +39,16 @@ public class SportstatsApp implements SparkApplication {
 
         before((req, res) -> {
             res.type("application/json");
+        });
+        
+        notFound((req, res) -> {
+            res.status(404);
+            return createError(404, "404 Not Found");
+        });
+        
+        internalServerError((req, res) -> {
+            res.status(500);
+            return createError(500, "500 Internal Server Error");
         });
 
         get("/spark/hello", (request, response) -> "{\"message\": \"Hello, world - from sparkjava endpoint\"}");
@@ -133,8 +145,22 @@ public class SportstatsApp implements SparkApplication {
         return new ServiceRunner<>(service).execute();
     }
 
-    private String createError(String message) {
+    private String createError(Integer statusCode, String message) {
+        Map<String, Object> errorContent = new HashMap<String, Object>() {{
+            if (statusCode != null) {
+                put("status", statusCode);
+            }
+            put("message", message);
+        }};
+        Map<String, Object> error = new HashMap<String, Object>() {{
+            put("error", errorContent);
+        }};
+        
         return new JsonOutputFormatter()
-                .createOutput(Collections.singletonMap("error", message));
+                .createOutput(error);
+    }
+    
+    private String createError(String message) {
+        return createError(null, message);
     }
 }
