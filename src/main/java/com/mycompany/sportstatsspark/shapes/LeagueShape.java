@@ -9,9 +9,7 @@ package com.mycompany.sportstatsspark.shapes;
  *
  * @author Davik
  */
-public class TeamShape {
+public class LeagueShape {
     public String name;
     public Long sportId;
-    
-    public TeamShape() {}
 }

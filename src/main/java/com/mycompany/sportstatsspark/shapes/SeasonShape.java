@@ -9,9 +9,10 @@ package com.mycompany.sportstatsspark.shapes;
  *
  * @author Davik
  */
-public class TeamShape {
-    public String name;
-    public Long sportId;
+public class SeasonShape {
+    public Long year;
+    public Boolean summer;
+    public Long leagueId;
     
-    public TeamShape() {}
+    public SeasonShape() {}
 }

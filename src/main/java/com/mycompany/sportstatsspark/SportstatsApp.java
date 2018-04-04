@@ -5,6 +5,8 @@
  */
 package com.mycompany.sportstatsspark;
 
+import com.mycompany.sportstatsspark.shapes.LeagueShape;
+import com.mycompany.sportstatsspark.shapes.SeasonShape;
 import com.mycompany.sportstatsspark.shapes.SportShape;
 import com.mycompany.sportstatsspark.shapes.TeamShape;
 import com.owlike.genson.Genson;
@@ -12,9 +14,13 @@ import java.util.Collections;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
+import sportstats.service.AddLeagueService;
+import sportstats.service.AddSeasonService;
 import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.GetAllSportsService;
+import sportstats.service.GetLeaguesBySportIdService;
+import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
@@ -49,6 +55,54 @@ public class SportstatsApp implements SparkApplication {
             }
         });
         
+        //Leagues
+        get("/sports/:id/leagues", (req, res) -> {
+            try {
+                return run(
+                        new GetLeaguesBySportIdService(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("SportId should be an integer");
+            }
+        });
+        post("/leagues", (req, res) -> {
+            try {
+                LeagueShape newLeague = new Genson().deserialize(req.body(), LeagueShape.class);
+                
+                return run(new AddLeagueService(newLeague.name, newLeague.sportId));
+            } catch (SportstatsServiceException ex) {
+                return createError(ex.getMessage());
+            } catch (Exception ex) {
+                return createError("Wrong shape.");
+            }
+        });
+        
+        //Seasons
+        get("/leagues/:id/seasons", (req, res) -> {
+            try {
+                return run(
+                        new GetSeasonsByLeagueIdService(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("LeagueId should be an integer");
+            }
+        });
+        post("/seasons", (req, res) -> {
+            try {
+                SeasonShape newSeason = new Genson().deserialize(req.body(), SeasonShape.class);
+                
+                return run(new AddSeasonService(newSeason.year, newSeason.summer, newSeason.leagueId));
+            } catch (SportstatsServiceException ex) {
+                return createError(ex.getMessage());
+            } catch (Exception ex) {
+                return createError("Wrong shape.");
+            }
+        });
+        
         //Teams
         get("/sports/:id/teams", (req, res) -> {
             try {
@@ -66,9 +120,7 @@ public class SportstatsApp implements SparkApplication {
             try {
                 TeamShape newTeam = new Genson().deserialize(req.body(), TeamShape.class);
                 
-                return run(new AddTeamService(newTeam.name, Long.valueOf(newTeam.sportId)));
-            } catch (NumberFormatException ex) {
-                return createError("SportId should be an integer");
+                return run(new AddTeamService(newTeam.name, newTeam.sportId));
             } catch (SportstatsServiceException ex) {
                 return createError(ex.getMessage());
             } catch (Exception ex) {
