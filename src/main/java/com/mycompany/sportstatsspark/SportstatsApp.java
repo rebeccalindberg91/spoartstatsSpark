@@ -17,6 +17,7 @@ import java.util.Map;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
+import sportstats.rest.shapes.GameShape;
 import sportstats.service.AddLeagueService;
 import sportstats.service.AddRoundService;
 import sportstats.service.AddSeasonService;
@@ -24,6 +25,7 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
+import sportstats.service.GetGamesByRoundService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
@@ -157,13 +159,6 @@ public class SportstatsApp implements SparkApplication {
         });
         
         //Rounds
-        /*
-        get("/seasons/:id/rounds", (req, res) -> {
-            try {
-                
-            }
-        })*/
-        
         post("/rounds", (req, res) -> {
           try {
               RoundShape newRound = new Genson().deserialize(req.body(), RoundShape.class);
@@ -174,6 +169,17 @@ public class SportstatsApp implements SparkApplication {
           }  catch (Exception ex) {
               return createError("Wrong shape.");
           }
+        });
+        
+        //Games
+        get("/games/:id", (req, res) -> {
+           try {
+              return run(
+                       new GetGamesByRoundService(
+                               Long.valueOf(req.params(":id"))));
+           } catch (NumberFormatException ex) {
+               return createError("RoundId should be an integer");
+           }
         });
     }
     
