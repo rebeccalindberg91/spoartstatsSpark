@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
+import sportstats.domain.Round;
 import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.service.AddLeagueService;
-import sportstats.service.AddRoundBySeasonService;
+import sportstats.service.AddRoundService;
 import sportstats.service.AddSeasonService;
 import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
@@ -169,7 +170,7 @@ public class SportstatsApp implements SparkApplication {
           try {
               RoundShape newRound = new Genson().deserialize(req.body(), RoundShape.class);
               
-              return run(new AddRoundBySeasonService(newRound.seasonId));
+              return run(new AddRoundService(newRound.seasonId));
           }  catch (SportstatsServiceException ex) {
               return createError(ex.getMessage());
           }  catch (Exception ex) {
