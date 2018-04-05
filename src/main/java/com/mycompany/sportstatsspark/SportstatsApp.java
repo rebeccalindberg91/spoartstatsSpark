@@ -7,6 +7,7 @@ package com.mycompany.sportstatsspark;
 
 import com.mycompany.sportstatsspark.shapes.LeagueShape;
 import com.mycompany.sportstatsspark.shapes.SeasonShape;
+import com.mycompany.sportstatsspark.shapes.SeasonTeamShape;
 import com.mycompany.sportstatsspark.shapes.SportShape;
 import com.mycompany.sportstatsspark.shapes.TeamShape;
 import com.owlike.genson.Genson;
@@ -20,6 +21,7 @@ import sportstats.service.AddLeagueService;
 import sportstats.service.AddSeasonService;
 import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
+import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
@@ -108,6 +110,19 @@ public class SportstatsApp implements SparkApplication {
                 SeasonShape newSeason = new Genson().deserialize(req.body(), SeasonShape.class);
                 
                 return run(new AddSeasonService(newSeason.year, newSeason.summer, newSeason.leagueId));
+            } catch (SportstatsServiceException ex) {
+                return createError(ex.getMessage());
+            } catch (Exception ex) {
+                return createError("Wrong shape.");
+            }
+        });
+        //get("/seasons/:id/teams", (req, res) -> "");
+        post("/seasons/:id/teams", (req, res) -> {
+            try {
+                SeasonTeamShape newSeasonTeam = new Genson().deserialize(req.body(), SeasonTeamShape.class);
+                
+                return run(new AddTeamToSeasonService(newSeasonTeam.teamId,
+                        newSeasonTeam.seasonId));
             } catch (SportstatsServiceException ex) {
                 return createError(ex.getMessage());
             } catch (Exception ex) {
