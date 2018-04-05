@@ -5,19 +5,17 @@
  */
 package com.mycompany.sportstatsspark;
 
-import com.mycompany.sportstatsspark.shapes.LeagueShape;
-import com.mycompany.sportstatsspark.shapes.RoundShape;
-import com.mycompany.sportstatsspark.shapes.SeasonShape;
-import com.mycompany.sportstatsspark.shapes.SeasonTeamShape;
-import com.mycompany.sportstatsspark.shapes.SportShape;
-import com.mycompany.sportstatsspark.shapes.TeamShape;
+import sportstats.rest.shapes.LeagueShape;
+import sportstats.rest.shapes.RoundShape;
+import sportstats.rest.shapes.SeasonShape;
+import sportstats.rest.shapes.SeasonTeamShape;
+import sportstats.rest.shapes.SportShape;
+import sportstats.rest.shapes.TeamShape;
 import com.owlike.genson.Genson;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
-import sportstats.domain.Round;
 import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.service.AddLeagueService;
 import sportstats.service.AddRoundService;
