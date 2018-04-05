@@ -168,7 +168,7 @@ public class SportstatsApp implements SparkApplication {
           try {
               RoundShape newRound = new Genson().deserialize(req.body(), RoundShape.class);
               
-              return run(new AddRoundService(newRound.seasonId));
+              return run(new AddRoundService(newRound.seasonId, newRound.games));
           }  catch (SportstatsServiceException ex) {
               return createError(ex.getMessage());
           }  catch (Exception ex) {
