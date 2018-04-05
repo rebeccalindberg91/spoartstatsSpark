@@ -6,6 +6,7 @@
 package com.mycompany.sportstatsspark;
 
 import com.mycompany.sportstatsspark.shapes.LeagueShape;
+import com.mycompany.sportstatsspark.shapes.RoundShape;
 import com.mycompany.sportstatsspark.shapes.SeasonShape;
 import com.mycompany.sportstatsspark.shapes.SeasonTeamShape;
 import com.mycompany.sportstatsspark.shapes.SportShape;
@@ -18,6 +19,7 @@ import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.service.AddLeagueService;
+import sportstats.service.AddRoundBySeasonService;
 import sportstats.service.AddSeasonService;
 import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
@@ -154,11 +156,33 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
+        
+        //Rounds
+        /*
+        get("/seasons/:id/rounds", (req, res) -> {
+            try {
+                
+            }
+        })*/
+        
+        post("/rounds", (req, res) -> {
+          try {
+              RoundShape newRound = new Genson().deserialize(req.body(), RoundShape.class);
+              
+              return run(new AddRoundBySeasonService(newRound.seasonId));
+          }  catch (SportstatsServiceException ex) {
+              return createError(ex.getMessage());
+          }  catch (Exception ex) {
+              return createError("Wrong shape.");
+          }
+        });
     }
-
+    
+    
     private String run(SportstatsService service) {
         return new ServiceRunner<>(service).execute();
     }
+    
 
     private String createError(Integer statusCode, String message) {
         Map<String, Object> errorContent = new HashMap<String, Object>() {{
