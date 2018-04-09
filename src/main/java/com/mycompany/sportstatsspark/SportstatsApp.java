@@ -25,7 +25,7 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
-import sportstats.service.GetGamesByRoundService;
+import sportstats.service.GetGamesByRoundIdService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
@@ -172,10 +172,9 @@ public class SportstatsApp implements SparkApplication {
         });
         
         //Games
-        get("/games/:id", (req, res) -> {
+        get("/rounds/:id/games", (req, res) -> {
            try {
-              return run(
-                       new GetGamesByRoundService(
+              return run(new GetGamesByRoundIdService(
                                Long.valueOf(req.params(":id"))));
            } catch (NumberFormatException ex) {
                return createError("RoundId should be an integer");
