@@ -27,12 +27,14 @@ import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
 import sportstats.service.GetGamesByRoundIdService;
+import sportstats.service.GetGamesByTeamIdService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
+import sportstats.service.constants.Outcome;
 
 /**
  *
@@ -179,6 +181,55 @@ public class SportstatsApp implements SparkApplication {
                         Long.valueOf(req.params(":id"))));
             } catch (NumberFormatException ex) {
                 return createError("RoundId should be an integer");
+            }
+        });
+        //GamesByTeamId and filter
+        get("/teams/:id/games", (req, res) -> {
+            try {
+                return run(
+                        new GetGamesByTeamIdService(
+                                Long.valueOf(req.params(":id")),
+                                Outcome.ANY
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
+            }
+        });
+        get("/teams/:id/games/wins", (req, res) -> {
+            try {
+                return run(
+                        new GetGamesByTeamIdService(
+                                Long.valueOf(req.params(":id")),
+                                Outcome.WIN
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
+            }
+        });
+        get("/teams/:id/games/ties", (req, res) -> {
+            try {
+                return run(
+                        new GetGamesByTeamIdService(
+                                Long.valueOf(req.params(":id")),
+                                Outcome.TIE
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
+            }
+        });
+        get("/teams/:id/games/losses", (req, res) -> {
+            try {
+                return run(
+                        new GetGamesByTeamIdService(
+                                Long.valueOf(req.params(":id")),
+                                Outcome.LOSS
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
             }
         });
 
