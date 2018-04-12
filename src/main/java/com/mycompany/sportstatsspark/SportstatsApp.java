@@ -18,6 +18,8 @@ import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.rest.shapes.ResultShape;
+import sportstats.rest.shapes.ArenaShape;
+import sportstats.rest.shapes.GameArenaShape;
 import sportstats.service.AddLeagueService;
 import sportstats.service.AddResultService;
 import sportstats.service.AddRoundService;
@@ -25,6 +27,7 @@ import sportstats.service.AddSeasonService;
 import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
+import sportstats.service.AddArenaService;
 import sportstats.service.GetAllSportsService;
 import sportstats.service.GetAwayGamesByTeamIdService;
 import sportstats.service.GetGamesByRoundIdService;
@@ -269,6 +272,7 @@ public class SportstatsApp implements SparkApplication {
         //Result
         post("/games/:id/result", (req, res) -> {
             try {
+                
                 ResultShape newResult = new Genson().deserialize(req.body(), ResultShape.class);
 
                 return run(
@@ -284,6 +288,27 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
+        
+        // ----------
+           //Arena
+        post("/arenas/:id/game", (req, res) -> {
+            try {
+                
+                GameArenaShape newArena = new Genson().deserialize(req.body(), GameArenaShape.class);
+
+                return run(
+                        new AddArenaService(newArena.name, newArena.gameId)
+                );
+            } catch (NumberFormatException ex) {
+                return createError("GameId should be an integer");
+            } catch (SportstatsServiceException ex) {
+                return createError(ex.getMessage());
+            } catch (Exception ex) {
+                return createError("Wrong shape.");
+            }
+        });
+        //---------
+
     }
 
     private String run(SportstatsService service) {
