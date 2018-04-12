@@ -29,13 +29,15 @@ import sportstats.service.GetAllSportsService;
 import sportstats.service.GetGamesByRoundIdService;
 import sportstats.service.GetGamesBySeasonIdService;
 import sportstats.service.GetGamesByTeamIdService;
+import sportstats.service.GetGamesLostByTeamIdService;
+import sportstats.service.GetGamesTiedByTeamIdService;
+import sportstats.service.GetGamesWonByTeamIdService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
-import sportstats.service.constants.Outcome;
 
 /**
  *
@@ -199,8 +201,7 @@ public class SportstatsApp implements SparkApplication {
             try {
                 return run(
                         new GetGamesByTeamIdService(
-                                Long.valueOf(req.params(":id")),
-                                Outcome.ANY
+                                Long.valueOf(req.params(":id"))
                         )
                 );
             } catch (NumberFormatException ex) {
@@ -210,9 +211,8 @@ public class SportstatsApp implements SparkApplication {
         get("/teams/:id/games/wins", (req, res) -> {
             try {
                 return run(
-                        new GetGamesByTeamIdService(
-                                Long.valueOf(req.params(":id")),
-                                Outcome.WIN
+                        new GetGamesWonByTeamIdService(
+                                Long.valueOf(req.params(":id"))
                         )
                 );
             } catch (NumberFormatException ex) {
@@ -222,9 +222,8 @@ public class SportstatsApp implements SparkApplication {
         get("/teams/:id/games/ties", (req, res) -> {
             try {
                 return run(
-                        new GetGamesByTeamIdService(
-                                Long.valueOf(req.params(":id")),
-                                Outcome.TIE
+                        new GetGamesTiedByTeamIdService(
+                                Long.valueOf(req.params(":id"))
                         )
                 );
             } catch (NumberFormatException ex) {
@@ -234,9 +233,8 @@ public class SportstatsApp implements SparkApplication {
         get("/teams/:id/games/losses", (req, res) -> {
             try {
                 return run(
-                        new GetGamesByTeamIdService(
-                                Long.valueOf(req.params(":id")),
-                                Outcome.LOSS
+                        new GetGamesLostByTeamIdService(
+                                Long.valueOf(req.params(":id"))
                         )
                 );
             } catch (NumberFormatException ex) {
