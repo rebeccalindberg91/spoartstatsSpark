@@ -291,7 +291,7 @@ public class SportstatsApp implements SparkApplication {
         
         // ----------
            //Arena
-        post("/arenas/:id/game", (req, res) -> {
+        post("/games/:id/arena", (req, res) -> {
             try {
                 
                 GameArenaShape newArena = new Genson().deserialize(req.body(), GameArenaShape.class);
