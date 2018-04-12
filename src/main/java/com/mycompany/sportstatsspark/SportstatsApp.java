@@ -26,12 +26,14 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
+import sportstats.service.GetAwayGamesByTeamIdService;
 import sportstats.service.GetGamesByRoundIdService;
 import sportstats.service.GetGamesBySeasonIdService;
 import sportstats.service.GetGamesByTeamIdService;
 import sportstats.service.GetGamesLostByTeamIdService;
 import sportstats.service.GetGamesTiedByTeamIdService;
 import sportstats.service.GetGamesWonByTeamIdService;
+import sportstats.service.GetHomeGamesByTeamIdService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
 import sportstats.service.GetTeamsBySportIdService;
@@ -234,6 +236,28 @@ public class SportstatsApp implements SparkApplication {
             try {
                 return run(
                         new GetGamesLostByTeamIdService(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
+            }
+        });
+        get("/teams/:id/games/home", (req, res) -> {
+            try {
+                return run(
+                        new GetHomeGamesByTeamIdService(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamId should be an integer");
+            }
+        });
+        get("/teams/:id/games/away", (req, res) -> {
+            try {
+                return run(
+                        new GetAwayGamesByTeamIdService(
                                 Long.valueOf(req.params(":id"))
                         )
                 );
