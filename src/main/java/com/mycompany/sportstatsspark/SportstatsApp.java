@@ -28,6 +28,7 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.AddArenaService;
+import sportstats.service.AddArenaService;
 import sportstats.service.GetAllSportsService;
 import sportstats.service.GetAwayGamesByTeamIdService;
 import sportstats.service.GetGamesByRoundIdService;
@@ -322,6 +323,19 @@ public class SportstatsApp implements SparkApplication {
             }
         });
         //---------
+        
+        // spectators
+         post("/games/:id/spectators", (req, res) -> {
+            try {
+                return run(
+                        new AddSpectatorsService(
+                                Long.valueOf(req.params("spectators")),
+                                Long.valueOf(req.params(":id"))
+                        ));
+            } catch (NumberFormatException ex) {
+                return createError("GameId should be an integer");
+            } 
+        });
 
     }
 
