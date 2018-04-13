@@ -28,7 +28,7 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.AddArenaService;
-import sportstats.service.AddArenaService;
+import sportstats.service.AddSpectatorsService;
 import sportstats.service.GetAllSportsService;
 import sportstats.service.GetAwayGamesByTeamIdService;
 import sportstats.service.GetGamesByRoundIdService;
@@ -333,7 +333,7 @@ public class SportstatsApp implements SparkApplication {
                                 Long.valueOf(req.params(":id"))
                         ));
             } catch (NumberFormatException ex) {
-                return createError("GameId should be an integer");
+                return createError("GameId and spectators should be an integer");
             } 
         });
 
