@@ -33,6 +33,7 @@ import sportstats.service.GetAwayGamesByTeamIdService;
 import sportstats.service.GetGamesByRoundIdService;
 import sportstats.service.GetGamesBySeasonIdService;
 import sportstats.service.GetGamesByTeamIdService;
+import sportstats.service.GetGamesByTeamIdsService;
 import sportstats.service.GetGamesLostByTeamIdService;
 import sportstats.service.GetGamesTiedByTeamIdService;
 import sportstats.service.GetGamesWonByTeamIdService;
@@ -266,6 +267,19 @@ public class SportstatsApp implements SparkApplication {
                 );
             } catch (NumberFormatException ex) {
                 return createError("TeamId should be an integer");
+            }
+        });
+        //GetGamesByTeamIds mettings between two teams
+        get("/teams/:firstId/:secondId/games", (req, res) -> {
+            try {
+                return run(
+                        new GetGamesByTeamIdsService(
+                                Long.valueOf(req.params(":firstId")),
+                                Long.valueOf(req.params(":secondId"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("TeamIds should be integers");
             }
         });
 
