@@ -12,6 +12,7 @@ import sportstats.rest.shapes.SeasonTeamShape;
 import sportstats.rest.shapes.SportShape;
 import sportstats.rest.shapes.TeamShape;
 import com.owlike.genson.Genson;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import static spark.Spark.*;
@@ -25,6 +26,7 @@ import sportstats.service.AddSportService;
 import sportstats.service.AddTeamService;
 import sportstats.service.AddTeamToSeasonService;
 import sportstats.service.GetAllSportsService;
+import sportstats.service.GetGamesByDateService;
 import sportstats.service.GetGamesByRoundIdService;
 import sportstats.service.GetLeaguesBySportIdService;
 import sportstats.service.GetSeasonsByLeagueIdService;
@@ -178,6 +180,15 @@ public class SportstatsApp implements SparkApplication {
                                Long.valueOf(req.params(":id"))));
            } catch (NumberFormatException ex) {
                return createError("RoundId should be an integer");
+           }
+        });
+        
+        get("/:date/games", (req, res) -> {
+           try {
+               return run (new GetGamesByDateService(
+               Date.valueOf(req.params(":date"))));
+           } catch (Exception ex) {
+               return createError("Date should be in format yyyy-mm-dd");
            }
         });
     }
