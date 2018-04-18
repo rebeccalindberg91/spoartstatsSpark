@@ -293,7 +293,9 @@ public class SportstatsApp implements SparkApplication {
                 return run(
                         new AddResultService(newResult.gameId,
                                 newResult.scoreHomeTeam,
-                                newResult.scoreAwayTeam)
+                                newResult.scoreAwayTeam,
+                                newResult.winType
+                        )
                 );
             } catch (NumberFormatException ex) {
                 return createError("GameId should be an integer");
