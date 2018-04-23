@@ -43,6 +43,7 @@ import sportstats.service.games.GetGamesWonByTeamIdService;
 import sportstats.service.games.GetHomeGamesByTeamIdService;
 import sportstats.service.leagues.GetLeaguesBySportIdService;
 import sportstats.service.seasons.GetSeasonsByLeagueIdService;
+import sportstats.service.tables.GetTableBySeasonId;
 import sportstats.service.teams.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
@@ -145,6 +146,17 @@ public class SportstatsApp implements SparkApplication {
                 return createError(ex.getMessage());
             } catch (Exception ex) {
                 return createError("Wrong shape.");
+            }
+        });
+        get("/seasons/:id/table", (req, res) -> {
+            try {
+                return run(
+                        new GetTableBySeasonId(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("SeasonId should be an integer");
             }
         });
 
