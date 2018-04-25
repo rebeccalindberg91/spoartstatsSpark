@@ -48,6 +48,8 @@ import sportstats.service.teams.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
+import sportstats.service.tables.GetAwayTableBySeasonId;
+import sportstats.service.tables.GetHomeTableBySeasonId;
 
 /**
  *
@@ -152,6 +154,28 @@ public class SportstatsApp implements SparkApplication {
             try {
                 return run(
                         new GetTableBySeasonId(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("SeasonId should be an integer");
+            }
+        });
+        get("/seasons/:id/table/home", (req, res) -> {
+            try {
+                return run(
+                        new GetHomeTableBySeasonId(
+                                Long.valueOf(req.params(":id"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("SeasonId should be an integer");
+            }
+        });
+        get("/seasons/:id/table/away", (req, res) -> {
+            try {
+                return run(
+                        new GetAwayTableBySeasonId(
                                 Long.valueOf(req.params(":id"))
                         )
                 );
