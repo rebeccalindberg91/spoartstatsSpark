@@ -51,6 +51,7 @@ import sportstats.service.SportstatsServiceException;
 import sportstats.service.tables.GetAwayTableBySeasonId;
 import sportstats.service.tables.GetHomeTableBySeasonId;
 import sportstats.service.tables.GetTableByRoundInterval;
+import sportstats.service.tables.GetTableByDateInterval;
 
 /**
  *
@@ -263,6 +264,18 @@ public class SportstatsApp implements SparkApplication {
                 return createError("SeasonId should be an integer");
             }
         });
+        
+        get("/:fromDate/:toDate/games", (req, res) -> {
+            try {
+                return run(new GetTableByDateInterval(
+                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":toDate"))));
+            } catch (Exception ex){
+                return createError("Date should be in format yyyy-mm-dd");
+            }
+        });
+        
+        
 
         //GamesByTeamId and filter
         get("/teams/:id/games", (req, res) -> {
@@ -331,7 +344,7 @@ public class SportstatsApp implements SparkApplication {
                 return createError("TeamId should be an integer");
             }
         });
-        //GetGamesByTeamIds mettings between two teams
+        //GetGamesByTeamIds meetings between two teams
         get("/teams/:firstId/:secondId/games", (req, res) -> {
             try {
                 return run(
