@@ -50,6 +50,8 @@ import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
 import sportstats.service.tables.GetAwayTableBySeasonId;
 import sportstats.service.tables.GetHomeTableBySeasonId;
+import sportstats.service.tables.GetTableByRoundInterval;
+import sportstats.service.tables.GetTableByDateInterval;
 
 /**
  *
@@ -183,6 +185,19 @@ public class SportstatsApp implements SparkApplication {
                 return createError("SeasonId should be an integer");
             }
         });
+        
+        get("/seasons/:seasonId/rounds/:round1/:round2/table", (req, res) -> {
+            try {
+                return run(new GetTableByRoundInterval(
+                                Long.valueOf(req.params(":seasonId")),
+                                Long.valueOf(req.params(":round1")),
+                                Long.valueOf(req.params(":round2"))
+                        )
+                );
+            } catch (NumberFormatException ex) {
+                return createError("SeasonId should be an integer");
+            }
+        });
 
         //Teams
         get("/sports/:id/teams", (req, res) -> {
@@ -249,6 +264,18 @@ public class SportstatsApp implements SparkApplication {
                 return createError("SeasonId should be an integer");
             }
         });
+        
+        get("/:fromDate/:toDate/games", (req, res) -> {
+            try {
+                return run(new GetTableByDateInterval(
+                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":toDate"))));
+            } catch (Exception ex){
+                return createError("Date should be in format yyyy-mm-dd");
+            }
+        });
+        
+        
 
         //GamesByTeamId and filter
         get("/teams/:id/games", (req, res) -> {
@@ -317,7 +344,7 @@ public class SportstatsApp implements SparkApplication {
                 return createError("TeamId should be an integer");
             }
         });
-        //GetGamesByTeamIds mettings between two teams
+        //GetGamesByTeamIds meetings between two teams
         get("/teams/:firstId/:secondId/games", (req, res) -> {
             try {
                 return run(
