@@ -51,7 +51,7 @@ import sportstats.service.SportstatsServiceException;
 import sportstats.service.tables.GetAwayTableBySeasonId;
 import sportstats.service.tables.GetHomeTableBySeasonId;
 import sportstats.service.tables.GetTableByRoundInterval;
-import sportstats.service.tables.GetTableByDateInterval;
+import sportstats.service.tables.GetTableBySeasonIdAndDateInterval;
 
 /**
  *
@@ -186,16 +186,29 @@ public class SportstatsApp implements SparkApplication {
             }
         });
         
-        get("/seasons/:seasonId/rounds/:round1/:round2/table", (req, res) -> {
+        get("/seasons/:id/table/rounds/:round1/:round2", (req, res) -> {
             try {
                 return run(new GetTableByRoundInterval(
-                                Long.valueOf(req.params(":seasonId")),
+                                Long.valueOf(req.params(":id")),
                                 Long.valueOf(req.params(":round1")),
                                 Long.valueOf(req.params(":round2"))
                         )
                 );
             } catch (NumberFormatException ex) {
                 return createError("SeasonId should be an integer");
+            }
+        });
+        
+        get("/seasons/:id/table/dates/:fromDate/:toDate", (req, res) -> {
+            try {
+                return run(new GetTableBySeasonIdAndDateInterval(
+                        Long.valueOf(req.params(":id")),
+                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":toDate"))));
+            } catch (NumberFormatException ex) {
+                return createError("SeasonId should be an integer");
+            } catch (Exception ex){
+                return createError("Date should be in format yyyy-mm-dd");
             }
         });
 
@@ -262,16 +275,6 @@ public class SportstatsApp implements SparkApplication {
                         Long.valueOf(req.params(":id"))));
             } catch (NumberFormatException ex) {
                 return createError("SeasonId should be an integer");
-            }
-        });
-        
-        get("/:fromDate/:toDate/games", (req, res) -> {
-            try {
-                return run(new GetTableByDateInterval(
-                        Date.valueOf(req.params(":fromDate")), 
-                        Date.valueOf(req.params(":toDate"))));
-            } catch (Exception ex){
-                return createError("Date should be in format yyyy-mm-dd");
             }
         });
         
