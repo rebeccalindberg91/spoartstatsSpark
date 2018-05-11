@@ -13,7 +13,9 @@ import sportstats.rest.shapes.SportShape;
 import sportstats.rest.shapes.TeamShape;
 import com.owlike.genson.Genson;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
@@ -43,7 +45,7 @@ import sportstats.service.games.GetGamesWonByTeamIdService;
 import sportstats.service.games.GetHomeGamesByTeamIdService;
 import sportstats.service.leagues.GetLeaguesBySportIdService;
 import sportstats.service.seasons.GetSeasonsByLeagueIdService;
-import sportstats.service.tables.GetTableBySeasonId;
+import sportstats.service.tables.GetTableBySeasonIds;
 import sportstats.service.teams.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
@@ -152,15 +154,20 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
-        get("/seasons/:id/table", (req, res) -> {
+        get("/seasons/:ids/table", (req, res) -> {
             try {
+                String[] strIds = req.params(":ids").split(",");
+                Long[] longIds = new Long[strIds.length];
+                
+                for (int i=0; i < longIds.length; i++) {
+                    longIds[i] = Long.valueOf(strIds[i]);
+                }
+                
                 return run(
-                        new GetTableBySeasonId(
-                                Long.valueOf(req.params(":id"))
-                        )
+                        new GetTableBySeasonIds(longIds)
                 );
             } catch (NumberFormatException ex) {
-                return createError("SeasonId should be an integer");
+                return createError("SeasonIds should be integers");
             }
         });
         get("/seasons/:id/table/home", (req, res) -> {
