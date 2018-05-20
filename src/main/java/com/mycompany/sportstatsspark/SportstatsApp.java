@@ -52,8 +52,14 @@ import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
 import sportstats.service.tables.GetAwayTableBySeasonId;
 import sportstats.service.tables.GetHomeTableBySeasonId;
+import sportstats.service.tables.GetTableByFilters;
 import sportstats.service.tables.GetTableByRoundInterval;
 import sportstats.service.tables.GetTableBySeasonIdAndDateInterval;
+import sportstats.service.tables.filters.DateIntervalFilter;
+import sportstats.service.tables.filters.GameFilter;
+import sportstats.service.tables.filters.RoundIntervalFilter;
+import sportstats.service.tables.filters.SeasonFilter;
+import sportstats.service.tables.filters.TableFilter;
 
 /**
  *
@@ -158,11 +164,11 @@ public class SportstatsApp implements SparkApplication {
             try {
                 String[] strIds = req.params(":ids").split(",");
                 Long[] longIds = new Long[strIds.length];
-                
-                for (int i=0; i < longIds.length; i++) {
+
+                for (int i = 0; i < longIds.length; i++) {
                     longIds[i] = Long.valueOf(strIds[i]);
                 }
-                
+
                 return run(
                         new GetTableBySeasonIds(longIds)
                 );
@@ -192,29 +198,29 @@ public class SportstatsApp implements SparkApplication {
                 return createError("SeasonId should be an integer");
             }
         });
-        
+
         get("/seasons/:id/table/rounds/:round1/:round2", (req, res) -> {
             try {
                 return run(new GetTableByRoundInterval(
-                                Long.valueOf(req.params(":id")),
-                                Long.valueOf(req.params(":round1")),
-                                Long.valueOf(req.params(":round2"))
-                        )
+                        Long.valueOf(req.params(":id")),
+                        Long.valueOf(req.params(":round1")),
+                        Long.valueOf(req.params(":round2"))
+                )
                 );
             } catch (NumberFormatException ex) {
                 return createError("SeasonId should be an integer");
             }
         });
-        
+
         get("/seasons/:id/table/dates/:fromDate/:toDate", (req, res) -> {
             try {
                 return run(new GetTableBySeasonIdAndDateInterval(
                         Long.valueOf(req.params(":id")),
-                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":fromDate")),
                         Date.valueOf(req.params(":toDate"))));
             } catch (NumberFormatException ex) {
                 return createError("SeasonId should be an integer");
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 return createError("Date should be in format yyyy-mm-dd");
             }
         });
@@ -266,14 +272,14 @@ public class SportstatsApp implements SparkApplication {
                 return createError("RoundId should be an integer");
             }
         });
-        
+
         get("/:date/games", (req, res) -> {
-           try {
-               return run (new GetGamesByDateService(
-               Date.valueOf(req.params(":date"))));
-           } catch (Exception ex) {
-               return createError("Date should be in format yyyy-mm-dd");
-           }
+            try {
+                return run(new GetGamesByDateService(
+                        Date.valueOf(req.params(":date"))));
+            } catch (Exception ex) {
+                return createError("Date should be in format yyyy-mm-dd");
+            }
         });
 
         get("/seasons/:id/games", (req, res) -> {
@@ -284,8 +290,6 @@ public class SportstatsApp implements SparkApplication {
                 return createError("SeasonId should be an integer");
             }
         });
-        
-        
 
         //GamesByTeamId and filter
         get("/teams/:id/games", (req, res) -> {
@@ -371,7 +375,7 @@ public class SportstatsApp implements SparkApplication {
         //Result
         post("/games/:id/result", (req, res) -> {
             try {
-                
+
                 ResultShape newResult = new Genson().deserialize(req.body(), ResultShape.class);
 
                 return run(
@@ -389,12 +393,12 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
-        
+
         // ----------
-           //Arena
+        //Arena
         post("/games/:id/arena", (req, res) -> {
             try {
-                
+
                 GameArenaShape newArena = new Genson().deserialize(req.body(), GameArenaShape.class);
 
                 return run(
@@ -409,9 +413,9 @@ public class SportstatsApp implements SparkApplication {
             }
         });
         //---------
-        
+
         // spectators
-         post("/games/:id/spectators", (req, res) -> {
+        post("/games/:id/spectators", (req, res) -> {
             try {
                 return run(
                         new AddSpectatorsService(
@@ -420,9 +424,85 @@ public class SportstatsApp implements SparkApplication {
                         ));
             } catch (NumberFormatException ex) {
                 return createError("GameId and spectators should be an integer");
-            } 
+            }
         });
 
+        //Table by filters
+        get("/table/:gameFilter", (req, res) -> {
+            GameFilter gameFilter;
+            SeasonFilter seasonFilter = null;
+            List<TableFilter> tableFilters = new ArrayList<>();
+
+            String strGf = req.params(":gameFilter");
+            String strIds = req.queryParams("seasonIds");
+            String strDateInterval = req.queryParams("dateBetween");
+            String strRoundInterval = req.queryParams("roundBetween");
+
+            if (strGf != null) {
+                try {
+                    gameFilter = GameFilter.valueOf(strGf.toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    return createError("Gamefilter should be all, home or away.");
+                }
+            } else {
+                gameFilter = GameFilter.ALL;
+            }
+
+            if (strIds != null) {
+                try {
+                    String[] strArrIds = strIds.split(",");
+                    Long[] longIds = new Long[strArrIds.length];
+                    for (int i = 0; i < longIds.length; i++) {
+                        longIds[i] = Long.valueOf(strArrIds[i]);
+                    }
+                    seasonFilter = new SeasonFilter(longIds);
+                } catch (NumberFormatException ex) {
+                    return createError("SeasonIds should be integers");
+                }
+            }
+
+            if (strDateInterval != null) {
+                String[] strArrDateInterval = strDateInterval.split(",");
+                if (strArrDateInterval.length != 2) {
+                    return createError("dateBetween should be two dates separated by commas");
+                }
+
+                Date fromDate, toDate;
+                try {
+                    fromDate = Date.valueOf(strArrDateInterval[0]);
+                    toDate = Date.valueOf(strArrDateInterval[1]);
+                } catch (IllegalArgumentException ex) {
+                    return createError("Dates should have the format yyyy-mm-dd");
+                }
+                
+                tableFilters.add(new DateIntervalFilter(fromDate, toDate));
+            }
+            
+            if (strRoundInterval != null) {
+                String[] strArrRoundInterval = strRoundInterval.split(",");
+                if (strArrRoundInterval.length != 2) {
+                    return createError("roundBetween should be two rounds separated by commas");
+                }
+                
+                Long fromRound, toRound;
+                try {
+                    fromRound = Long.valueOf(strArrRoundInterval[0]);
+                    toRound = Long.valueOf(strArrRoundInterval[1]);
+                } catch (NumberFormatException ex) {
+                    return createError("Rounds should be integers");
+                }
+                
+                tableFilters.add(new RoundIntervalFilter(fromRound, toRound));
+            }
+            
+            return run(
+                    new GetTableByFilters(
+                            gameFilter,
+                            seasonFilter,
+                            tableFilters.toArray(new TableFilter[tableFilters.size()])
+                    )
+            );
+        });
     }
 
     private String run(SportstatsService service) {
