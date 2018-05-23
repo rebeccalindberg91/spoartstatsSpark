@@ -50,6 +50,10 @@ import sportstats.service.teams.GetTeamsBySportIdService;
 import sportstats.service.ServiceRunner;
 import sportstats.service.SportstatsService;
 import sportstats.service.SportstatsServiceException;
+import sportstats.service.games.GetBiggestLossByTeamIdAndDateIntervalService;
+import sportstats.service.games.GetBiggestLossByTeamIdAndRoundIntervalService;
+import sportstats.service.games.GetBiggestWinByTeamIdAndDateIntervalService;
+import sportstats.service.games.GetBiggestWinByTeamIdAndRoundIntervalService;
 import sportstats.service.tables.GetAwayTableBySeasonId;
 import sportstats.service.tables.GetHomeTableBySeasonId;
 import sportstats.service.tables.GetTableByRoundInterval;
@@ -285,7 +289,49 @@ public class SportstatsApp implements SparkApplication {
             }
         });
         
+        get("/teams/:id/:fromDate/:toDate/biggestWinDate", (req, res) -> {
+            try {
+                return run(new GetBiggestWinByTeamIdAndDateIntervalService(
+                        Long.valueOf(req.params(":id")), 
+                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":toDate"))));
+            } catch (Exception ex) {
+                return createError("teamId should be an integer. Date should be in format yyyy-mm-dd");
+            }
+        });
         
+        get("/teams/:id/:fromDate/:toDate/biggestLossDate", (req, res) -> {
+            try {
+                return run(new GetBiggestLossByTeamIdAndDateIntervalService(
+                        Long.valueOf(req.params(":id")), 
+                        Date.valueOf(req.params(":fromDate")), 
+                        Date.valueOf(req.params(":toDate"))));
+            } catch (Exception ex) {
+                return createError("teamId should be an integer. Date should be in format yyyy-mm-dd");
+            }
+        });
+        
+        get("/teams/:id/:fromRound/:toRound/biggestWinRound", (req, res) -> {
+            try {
+                return run(new GetBiggestWinByTeamIdAndRoundIntervalService(
+                        Long.valueOf(req.params(":id")), 
+                        Long.valueOf(req.params(":fromRound")), 
+                        Long.valueOf(req.params(":toRound"))));
+            } catch (Exception ex) {
+                return createError("teamId, fromRound and toRound should be integers");
+            }
+        });
+        
+        get("/teams/:id/:fromRound/:toRound/biggestLossRound", (req, res) -> {
+            try {
+                return run(new GetBiggestLossByTeamIdAndRoundIntervalService(
+                        Long.valueOf(req.params(":id")), 
+                        Long.valueOf(req.params(":fromRound")), 
+                        Long.valueOf(req.params(":toRound"))));
+            } catch (Exception ex) {
+                return createError("teamId, fromRound and toRound should be integers");
+            }
+        });
 
         //GamesByTeamId and filter
         get("/teams/:id/games", (req, res) -> {
@@ -367,7 +413,7 @@ public class SportstatsApp implements SparkApplication {
                 return createError("TeamIds should be integers");
             }
         });
-
+        
         //Result
         post("/games/:id/result", (req, res) -> {
             try {
