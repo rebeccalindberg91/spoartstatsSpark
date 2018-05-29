@@ -23,6 +23,8 @@ import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.rest.shapes.ResultShape;
 import sportstats.rest.shapes.ArenaShape;
 import sportstats.rest.shapes.GameArenaShape;
+import sportstats.rest.shapes.GameShape;
+import sportstats.rest.shapes.SpectatorShape;
 import sportstats.service.leagues.AddLeagueService;
 import sportstats.service.games.AddResultService;
 import sportstats.service.games.AddRoundService;
@@ -445,7 +447,7 @@ public class SportstatsApp implements SparkApplication {
 
         // ----------
         //Arena
-        post("/games/:id/arena", (req, res) -> {
+        post("/games/arena", (req, res) -> {
             try {
 
                 GameArenaShape newArena = new Genson().deserialize(req.body(), GameArenaShape.class);
@@ -464,13 +466,12 @@ public class SportstatsApp implements SparkApplication {
         //---------
 
         // spectators
-        post("/games/:id/spectators", (req, res) -> {
+        post("/games/spectators", (req, res) -> {
             try {
+                SpectatorShape addSpectators = new Genson().deserialize(req.body(), SpectatorShape.class);
                 return run(
-                        new AddSpectatorsService(
-                                Long.valueOf(req.params("spectators")),
-                                Long.valueOf(req.params(":id"))
-                        ));
+                        new AddSpectatorsService(addSpectators.spectators, addSpectators.gameId)
+                        );
             } catch (NumberFormatException ex) {
                 return createError("GameId and spectators should be an integer");
             }
