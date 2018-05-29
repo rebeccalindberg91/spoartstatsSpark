@@ -21,7 +21,6 @@ import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 import sportstats.rest.json.JsonOutputFormatter;
 import sportstats.rest.shapes.ResultShape;
-import sportstats.rest.shapes.ArenaShape;
 import sportstats.rest.shapes.GameArenaShape;
 import sportstats.rest.shapes.GameShape;
 import sportstats.rest.shapes.SpectatorShape;
@@ -90,10 +89,6 @@ public class SportstatsApp implements SparkApplication {
             return createError(500, "500 Internal Server Error");
         });
 
-        get("/spark/hello", (request, response) -> "{\"message\": \"Hello, world - from sparkjava endpoint\"}");
-        get("/spark/hello/:name", (request, response) -> "{\"message\": \"Hello, " + request.params(":name") + " - from sparkjava endpoint with parameter\"}");
-        post("/spark/hello2", (request, response) -> "{\"message\": \"Hello, world - from sparkjava endpoint 2\"}");
-
         //Sports
         get("/sports", (request, response) -> run(new GetAllSportsService()));
         post("/sports", (req, res) -> {
@@ -153,8 +148,8 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
-        //get("/seasons/:id/teams", (req, res) -> "");
-        post("/seasons/:id/teams", (req, res) -> {
+        
+        post("/seasons/teams", (req, res) -> {
             try {
                 SeasonTeamShape newSeasonTeam = new Genson().deserialize(req.body(), SeasonTeamShape.class);
 
@@ -297,7 +292,6 @@ public class SportstatsApp implements SparkApplication {
             }
         });
 
-        //GamesByTeamId and filter
         get("/teams/:id/games", (req, res) -> {
             try {
                 return run(
@@ -445,7 +439,6 @@ public class SportstatsApp implements SparkApplication {
             }
         });
 
-        // ----------
         //Arena
         post("/games/arena", (req, res) -> {
             try {
@@ -463,7 +456,6 @@ public class SportstatsApp implements SparkApplication {
                 return createError("Wrong shape.");
             }
         });
-        //---------
 
         // spectators
         post("/games/spectators", (req, res) -> {
